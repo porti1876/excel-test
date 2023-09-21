@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="report_test_libro_compra" model="ir.actions.report">
+        <field name="name">Libro de compra xlsx</field>
+        <field name="model">account.move</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">l10n_libro_iva.report_test_libro_compra</field>
+        <field name="report_file">l10n_libro_iva.report_test_libro_compra</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="binding_view_types">tree</field>
+    </record>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <record id="view_libro_compra_proveedor" model="ir.ui.view">
+        <field name="name">Libro de Iva compra</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <tree string="Libro compra" default_order="invoice_date desc" create="false" delete="false">
+                <field name="currency_id" invisible="1"/>
+                <field name="empty_field" string="N°"/>
+                <field name="final_date" string="Fecha de emisión del documento"/>
+                <field name="ref" string="Número de documento"/>
+                <field name="document_nrc" string="NRC"/>
+                <field name="document_nit_dui" string="NIT/DUI"/>
+                <field name="partner_id" string="Nombre"/>
+                <field name="compras_exentas_internas" string="Compras exentas locales"
+                       widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="compras_exentas_importacion" string="Compras exentas importaciones" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"/>
+                <field name="compras_exentas_internacional" string="Compras exentas internaciones" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"/>
+                <field name="compras_gravadas_internas" widget="monetary" options="{'currency_field': 'currency_id'}"
+                       string="Compras gravadas locales" sum="Total sin impuestos"/>
+                <field name="compras_gravadas_importacion" string="Compras gravadas importaciones" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"/>
+                <field name="compras_gravadas_internacionales" string="Compras gravadas internaciones" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"/>
+                <field name="iva_ccf" widget="monetary" options="{'currency_field': 'currency_id'}"
+                       string="IVA(Crédito Fiscal)" sum="Total de impuestos"/>
+                <field name="amount_total_compras" widget="monetary" options="{'currency_field': 'currency_id'}"
+                       string="Total de compras" sum="Total con impuestos incluidos"/>
+                <field name="anticipo_cuenta_percibido" string="Percepción" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"/>
+                <field name="compras_retencion_terceros" string="Retención a terceros"/>
+                <field name="compras_sujeto_excluido" string="Sujetos de retención" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_libro_compra_iva_proveedor" model="ir.actions.act_window">
+        <field name="name">Libro De Compras A Contribuyentes</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">[('move_type', '=', 'in_invoice'), ('state', '=', 'posted')]</field>
+        <field name="context">{'default_move_type': 'in_invoice'}</field>
+        <field name="view_id" ref="view_libro_compra_proveedor"/>
+    </record>
+
+
+
+</odoo>

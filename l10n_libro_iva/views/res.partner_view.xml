@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="res_partner_sujeto_excluido" model="ir.ui.view">
+        <field name="name">Sujeto excluido</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_registry']" position="before">
+                <field name="is_sujeto_excluido"/>
+                <field name="is_inter_libro_compra"/>
+                <field name="is_export_libro_cf"/>
+            </xpath>
+
+        </field>
+    </record>
+
+
+</odoo>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="account_journal_book_view" model="ir.ui.view">
+        <field name="name">Libro de Iva</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.view_account_journal_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='restrict_mode_hash_table']" position="after">
+                <field name="book_type"/>
+                <field name="select_location"/>
+                <field name="percepcion_purchase_book"/>
+            </xpath>
+
+        </field>
+    </record>
+
+
+</odoo>

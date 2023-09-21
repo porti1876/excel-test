@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="move_type_gravada" model="account.move.type">
+            <field name="name">Gravadas</field>
+            <field name="description">Tipo de factura en linea gravada</field>
+        </record>
+        <record id="move_type_exento" model="account.move.type">
+            <field name="name">Exentas</field>
+            <field name="description">Tipo de factura en linea exentas</field>
+        </record>
+    </data>
+</odoo>

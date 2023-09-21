@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="report_test_libro_venta_fc" model="ir.actions.report">
+        <field name="name">Libro de venta consumidor final xlsx</field>
+        <field name="model">account.move</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">l10n_libro_iva.report_test_libro_venta_fc</field>
+        <field name="report_file">l10n_libro_iva.report_test_libro_venta_fc</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="binding_view_types">tree</field>
+    </record>
+
+    <record id="view_libro_venta_cf" model="ir.ui.view">
+        <field name="name">Libro de Iva Ventas Consumidor Final</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <tree string="Libro de ventas Consumidor final" default_order="invoice_date desc" create="false" delete="false">
+                <field name="currency_id" invisible="1"/>
+                <field name="state" invisible="1"/>
+                <field name="invoice_date" string="Fecha" decoration-danger="state == 'cancel'"/>
+                <field name="name" string="Número de factura" decoration-danger="state == 'cancel'"/>
+                <field name="num_local_fc" string="Local" decoration-danger="state == 'cancel'"/>
+                <field name="num_caja" string="Caja" decoration-danger="state == 'cancel'"/>
+                <field name="ventas_no_sujetas" string="No sujetas" decoration-danger="state == 'cancel'" />
+
+                <field name="ventas_exentas_fc" string="Exentas" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"  decoration-danger="state == 'cancel'" />
+
+                <field name="ventas_gravadas_fc" widget="monetary" options="{'currency_field': 'currency_id'}"
+                       string="Gravadas" sum="Gravadas" decoration-danger="state == 'cancel'" />
+
+                <field name="ventas_exportaciones_fc" string="Exportaciones" widget="monetary"
+                       options="{'currency_field': 'currency_id'}" sum="Exportaciones"  decoration-danger="state == 'cancel'"/>
+
+                <field name="retencion_fc" string="Retención" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"  decoration-danger="state == 'cancel'"/>
+
+                <field name="percepcion_fc" string="Percepción" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"  decoration-danger="state == 'cancel'"/>
+
+                <field name="total_fc" widget="monetary" options="{'currency_field': 'currency_id'}"
+                       string="Total" sum="Total Ventas"  decoration-danger="state == 'cancel'"/>
+
+                <field name="ventas_cuenta_terceros" string="Ventas a cuentas de terceros"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="action_libro_venta_cf" model="ir.actions.act_window">
+        <field name="name">Libro De Ventas Consumidor Final</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">['&amp;', ('move_type', 'in', ['out_invoice', 'out_refund']),
+                              ('journal_id.book_type', '=', 'fcf')]</field>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+        <field name="view_id" ref="view_libro_venta_cf"/>
+    </record>
+</odoo>

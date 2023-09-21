@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="view_libro_compra_vendor" model="ir.ui.view">
+        <field name="name">Libro de iva compra</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <tree string="Libro compra">
+                <field name="currency_id" invisible="1"/>
+                <field name="empty_field" string="N°"/>
+                <field name="invoice_date" string="Fecha de emisión del documento"/>
+                <field name="name" string="Número de documento"/>
+                <field name="document_nrc" string="Número de registro del contribuyente"/>
+                <field name="partner_id" string="Nombre del proveedor"/>
+                <field name="empty_field" string="Compras exentas internas"/>
+                <field name="empty_field" string="Importaciones e internaciones exentas"/>
+                <field name="amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}" string="Compras internas gravadas"/>
+                <field name="empty_field" string="Importaciones e internaciones exentas"/>
+                <field name="amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}" string="Crédito Fiscal"/>
+                <field name="empty_field" string="Anticipo a cuenta Iva percibido"/>
+                <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}" string="Total de compras"/>
+                <field name="empty_field" string="Compras a sujetos exlcuidos"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="action_libro_compra_iva" model="ir.actions.act_window">
+        <field name="name">Libro de iva compra6</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_libro_compra_vendor"/>
+    </record>
+
+    <menuitem id="menu_libro_compra"
+              name="Libro de iva compra6"
+              parent="account.menu_finance_payables"
+              action="action_libro_compra_iva"/>
+</odoo>

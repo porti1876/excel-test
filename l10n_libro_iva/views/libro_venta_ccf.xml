@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+
+
+    <record id="report_test_libro_venta_ccf" model="ir.actions.report">
+        <field name="name">Libro de venta contribuyentes xlsx</field>
+        <field name="model">account.move</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">l10n_libro_iva.report_test_libro_venta_ccf</field>
+        <field name="report_file">l10n_libro_iva.report_test_libro_venta_ccf</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="binding_view_types">tree</field>
+    </record>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <record id="view_libro_venta_vendor" model="ir.ui.view">
+        <field name="name">Libro de Iva Ventas Contribuyentes</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <tree string="Libro ventas a contribuyentes" default_order="invoice_date desc" create="false" delete="false">
+                <field name="currency_id" invisible="1"/>
+                <field name="state" invisible="1"/>
+                <field name="empty_field" string="N°" decoration-danger="state == 'cancel'"/>
+                <field name="date" string="Fecha de emisión del documento" decoration-danger="state == 'cancel'"/>
+                <field name="name" string="Número de documento" decoration-danger="state == 'cancel'" />
+                <field name="partner_id" string="Nombre del cliente" decoration-danger="state == 'cancel'" attrs="{'invisible' : [('state', '!=', 'posted')]}"/>
+                <field name="document_nrc" string="NRC" decoration-danger="state == 'cancel'" attrs="{'invisible' : [('state', '!=', 'posted')]}"/>
+                <field name="ventas_no_sujetas" string="Ventas no sujetas" decoration-danger="state == 'cancel'"/>
+                <field name="ventas_exentas_ccf" string="Exentas Propia" widget="monetary"
+                       options="{'currency_field': 'currency_id'}" sum="Ventas exentas" decoration-danger="state == 'cancel'"/>
+                <field name="ventas_gravadas_ccf" widget="monetary" options="{'currency_field': 'currency_id'}"
+                        string="Gravadas propia" sum="Gravadas Propia" decoration-danger="state == 'cancel'"
+                        />
+
+                <field name="iva_ccf" widget="monetary" options="{'currency_field': 'currency_id'}"
+                       string="IVA Deb. Fiscal Propia" sum="Total de impuestos de Iva" decoration-danger="state == 'cancel'"/>
+                <field name="ventas_exentas_terceros" string="Exentas Cuenta Terceros" decoration-danger="state == 'cancel'"/>
+                <field name="ventas_gravadas_terceros" string="Gravadas Cuenta Terceros" decoration-danger="state == 'cancel'"/>
+                <field name="ventas_iva_terceros" string="Iva Deb. Fiscal Terceros" decoration-danger="state == 'cancel'"/>
+                <field name="retencion_fc" string="Iva retenido" decoration-danger="state == 'cancel'"/>
+                <field name="percepcion_ccf" string="Iva percibido" decoration-danger="state == 'cancel'"/>
+                <field name="total_ccf" widget="monetary" options="{'currency_field': 'currency_id'}"
+                       string="Venta Total" sum="Total con impuestos incluidos" decoration-danger="state == 'cancel'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_libro_venta_iva" model="ir.actions.act_window">
+        <field name="name">Libro de Ventas a Contribuyentes</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">['&amp;', ('move_type', 'in', ['out_invoice', 'out_refund', 'entry']),
+                              ('journal_id.book_type', '=', 'ccf')]</field>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+        <field name="view_id" ref="view_libro_venta_vendor"/>
+    </record>
+
+</odoo>

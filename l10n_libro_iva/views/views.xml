@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="view_purchase_order_new" model="ir.ui.view">
+        <field name="name">purchase.order.new</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='purchase_order']" position="after">
+                <page name="purchase_order_new" string="New View">
+                    <field name="date"/>
+                    <field name="name"/>
+                    <!-- Agrega más campos aquí si deseas -->
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

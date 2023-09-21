@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem
+            parent="account.menu_finance_reports"
+            id="menu_libro_iva"
+            name="Libros de Iva"
+    />
+    <menuitem
+            parent="menu_libro_iva"
+            action="action_libros_iva_wizard"
+            id="menu_libro_compra"
+            sequence="10"
+    />
+
+
+</odoo>

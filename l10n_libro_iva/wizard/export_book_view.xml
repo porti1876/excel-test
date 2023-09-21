@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_export_vat_book_sv" model="ir.ui.view">
+        <field name="name">export.vat.book.sv.form</field>
+        <field name="model">export.vat.book.sv</field>
+        <field name="arch" type="xml">
+            <form string="Export General Ledger">
+                <group>
+                    <field name="company_id"/>
+                    <field name="select_book"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                </group>
+                <footer>
+                    <button name="open_selected_book" string="Abrir vista" type="object" class="btn-primary"/>
+                    <button name="action_print_compra_book" string="Exportar PDF" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_libros_iva_wizard" model="ir.actions.act_window">
+        <field name="name">Seleccionar Libro de IVA</field>
+        <field name="res_model">export.vat.book.sv</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_export_vat_book_sv"/>
+        <field name="target">new</field>
+        <field name="groups_id" eval="[(6, 0, [ref('base.group_no_one')])]"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+    <!--    <record id="action_generate_from_vat_book" model="ir.actions.server">-->
+    <!--        <field name="name">Generar PDF Libros de IVA</field>-->
+    <!--        <field name="model_id" ref="account.model_account_move"/>-->
+    <!--        <field name="binding_model_id" ref="account.model_account_move"/>-->
+    <!--        <field name="state">code</field>-->
+    <!--        <field name="code">action = records.open_wizard_vat_book()</field>-->
+    <!--    </record>-->
+
+    <!--    <record id="action_report_general_ledger_sv" model="ir.actions.report">-->
+    <!--        <field name="name">Libro de compra</field>-->
+    <!--        <field name="model">account.move</field>-->
+    <!--        <field name="report_type">qweb-pdf</field>-->
+    <!--        <field name="report_name">l10n_libro_iva.template_libro_compra</field>-->
+    <!--        <field name="report_file">l10n_libro_iva.template_libro_compra</field>-->
+    <!--        <field name="binding_model_id" ref="account.model_account_move"/>-->
+    <!--        <field name="binding_type">report</field>-->
+    <!--        &lt;!&ndash;        <field name="binding_view_types">tree</field>&ndash;&gt;-->
+    <!--    </record>-->
+
+</odoo>

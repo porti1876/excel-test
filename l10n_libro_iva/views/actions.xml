@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="view_libro_compra" model="ir.ui.view">
+        <field name="name">Libro de iva compra</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <!-- Aquí puedes agregar tus modificaciones a la vista -->
+            <tree string="Libro compra">
+                <field name="currency_id" invisible="1"/>
+                <field name="empty_field"/>
+                <field name="invoice_date"/>
+                <field name="name" string="Número de correlativo"/>
+                <field name="document_nrc"/>
+                <field name="partner_id" string="Nombre"/>
+                <field name="empty_field"/>
+                <field name="empty_field"/>
+                <field name="amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="empty_field"/>
+                <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="empty_field"/>
+
+
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="action_purchase_order_new" model="ir.actions.act_window">
+        <field name="name">Libro de iva compra5</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_libro_compra"/>
+    </record>
+
+    <menuitem id="menu_purchase_order_new"
+              name="Libro de iva compra5"
+              parent="account.menu_finance_payables"
+              action="action_purchase_order_new"/>
+</odoo>

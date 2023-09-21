@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="view_move_type" model="ir.ui.view">
+        <field name="name">account.move.type.tree</field>
+        <field name="model">account.move.type</field>
+        <field name="arch" type="xml">
+            <tree string="Tipo de movimiento (Gravada/Exento)">
+                <field name="name"/>
+                <field name="description"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_account_move_type" model="ir.actions.act_window">
+        <field name="name">Es gravado o exento</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.move.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_account_move_type"
+              name="Tipo de movimiento gravado o exento"
+              parent="account.menu_finance_reports"
+              action="action_account_move_type"
+    />
+
+    <record id="view_move_type_line" model="ir.ui.view">
+        <field name="name">account.move.type.line</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='tax_ids']" position="after">
+                <field name="move_type_ids"/>
+            </xpath>
+            <xpath expr="//group[@name='accounting_info_group']" position="inside">
+                <!--                <field name="is_late_date" attrs="{'invisible': [('move_type', '!=', 'in_invoice')]}"/>-->
+                <field name="is_invoice_book" attrs="{'invisible': [('move_type', '!=', 'in_invoice')]}" widget="boolean_toggle"/>
+                <field name="test_bool" attrs="{'invisible': [('move_type', '!=', 'in_invoice')]}"/>
+                <field name="libro_compra_fecha"
+                       attrs="{'invisible': ['|', ('move_type', '!=', 'in_invoice'), ('test_bool', '!=', False)]}"/>
+                <field name="final_date" attrs="{'invisible': [('move_type', '!=', 'in_invoice')]}"/>
+
+            </xpath>
+
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="partner_doc_liquidacion" invisible="True"/>
+                <field name="percepcion_related" invisible="True"/>
+                <field name="partner_id" string="Partner para documento liquidacion"
+                       attrs="{'invisible': ['|', ('move_type', '!=', 'entry'), ('partner_doc_liquidacion', '!=', 'ccf')], 'readonly': False}"/>
+                <field name="partner_id" string="Partner para percepción en libro compra"
+                       attrs="{'invisible': ['|', ('move_type', '!=', 'entry'), ('percepcion_related', '!=', True)], 'readonly': False}"/>
+                <field name="final_date" string="Fecha final libro compra"
+                       attrs="{'invisible': ['|', ('move_type', '!=', 'entry'), ('percepcion_related', '!=', True)], 'readonly': False}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

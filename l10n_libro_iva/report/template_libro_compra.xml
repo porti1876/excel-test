@@ -1,0 +1,2217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="report_libro_compra_sv" model="ir.actions.report">
+            <field name="name">Libro de IVA</field>
+            <field name="model">export.vat.book.sv</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">l10n_libro_iva.template_libro_compra_dos</field>
+            <field name="report_file">l10n_libro_iva.template_libro_compra_dos</field>
+            <field name="print_report_name">Libro prueba</field>
+            <field name="binding_type">report</field>
+
+        </record>
+
+        <template id="internal_layout_libro">
+            <t t-if="not o" t-set="o" t-value="doc"/>
+
+            <t t-if="not company">
+                <!-- Multicompany -->
+                <t t-if="company_id">
+                    <t t-set="company" t-value="company_id"/>
+                </t>
+                <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-else="else">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+            </t>
+
+            <div class="header">
+
+                <div class="container">
+                    <!--                            Primera columna del encabezado (Fecha del libro)-->
+                    <div class="container-1" style="width:33.3%; float: left; font:14pt bold">
+                        <div class="col-4">
+                            <img t-if="company.logo" t-att-src="image_data_uri(company.logo)"
+                                 style="height: 50px;"/>
+                        </div>
+                        <div class="container-min1" style="text-align:left">
+                            <t t-if="data['date_from']">
+                                <span>Fecha Inicio:</span>
+                                <t t-esc="data['date_from']"
+                                   t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>
+                            </t>
+                            <br/>
+                            <t t-if="data['date_to']">
+                                <span>Fecha Final:</span>
+                                <t t-esc="data['date_to']"
+                                   t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!--                                Segunda columna del encabezado (Tipo de libro y expresado en:)-->
+                    <div class="container-2" style="width:33.3%; float:left; font:14pt bold">
+                        <div class="container-min2" style="text-align:center;">
+                            <t t-if="data['select_book'] == 'compra'">
+                                <span>Libro de compras</span>
+                                <br/>
+                                <span>
+                                    <t t-esc="company.name"/>
+                                </span>
+                                <br/>
+                                <span>
+                                    <t t-esc="company.street"/>
+                                </span>
+                                <br/>
+                                <span>(Expresado en Dólares de los Estados Unidos de América)</span>
+                            </t>
+                            <t t-if="data['select_book'] == 'ventas_ccf'">
+                                <span>Libro de ventas contribuyentes</span>
+                                <br/>
+                                <span>
+                                    <t t-esc="company.name"/>
+                                </span>
+                                <br/>
+                                <span>
+                                    <t t-esc="company.street"/>
+                                </span>
+                                <br/>
+                                <span>(Expresado en Dólares de los Estados Unidos de América)</span>
+
+                            </t>
+                            <t t-if="data['select_book'] == 'ventas_cf'">
+                                <span>Libro de consumidor final/fex</span>
+                                <br/>
+                                <span>
+                                    <t t-esc="company.name"/>
+                                </span>
+                                <br/>
+                                <span>
+                                    <t t-esc="company.street"/>
+                                </span>
+                                <br/>
+                                <span>(Expresado en Dólares de los Estados Unidos de América)</span>
+
+                            </t>
+                            <br/>
+                        </div>
+                    </div>
+
+                    <!--                               Tercera columna (Datos fiscales)-->
+
+                    <div class="container-3" style="width:33.3%; float: left; font:14pt bold">
+                        <div class="container-min3" style="text-align:right;">
+                            <ul class="list-inline">
+                                <span>Página</span>
+                                <li class="list-inline-item">
+                                    <span class="page"/>
+                                </li>
+                                <li class="list-inline-item">De
+                                </li>
+                                <li class="list-inline-item">
+                                    <span class="topage"/>
+                                </li>
+                            </ul>
+                            <t t-if="data['company_id']">
+                                <span>NRC:</span>
+                                <t t-esc="data['vat_company']"/>
+                                <br/>
+
+                                <span>NIT:</span>
+                                <t t-esc="data['nit_company']"/>
+                            </t>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+                 t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <t t-out="0"/>
+            </div>
+        </template>
+
+        <template id="template_libro_compra_dos">
+            <t t-call="web.html_container">
+                <!--                <t t-set="data_report_margin_top" t-value="20"/>-->
+                <!--                <t t-set="data_report_header_spacing" t-value="16"/>-->
+                <!--                <t t-set="data_report_dpi" t-value="110"/>-->
+                <t t-if="o and 'company_id' in o">
+                    <t t-set="company" t-value="o.company_id"></t>
+                </t>
+                <t t-if="not o or not 'company_id' in o">
+                    <t t-set="company" t-value="res_company"></t>
+                </t>
+                <t t-call="l10n_libro_iva.internal_layout_libro">
+                    <!--                    Información principal donde se ubica la info de la empresa y la tabla de saldos-->
+
+                    <div class="page">
+                        <br/>
+                        <br/>
+
+
+                        <!--    TODO: DIVIDIR POR TIPO DE LIBRO PARA QUE TENGAN DIFERENTES DATOS DEPENDIENDO DEL LIBRO
+                                        ACTUALMENTE SOLO ESTA DISPONIBL4EL LIBRO DE COMPRA-->
+                        <div class="table">
+
+                            <!--                            Table de libro de compra-->
+                            <t t-if="data['select_book'] == 'compra'">
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:left;">
+                                                <strong>N°</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Fecha de documento</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Número de documento</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>NRC</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>NIT/DUI</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Nombre</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Compras exentas locales</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Compras exentas importaciones</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Compras exentas internaciones</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Compras gravadas locales</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Compras gravadas importaciones</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Compras gravadas internaciones</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>IVA(Crédito Fiscal)</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Total de compras</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Percepción</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Retención a terceros</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Sujetos de retención</strong>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="line_number" t-value="1"/>
+
+                                        <t t-foreach="account_moves_compra" t-as="move">
+
+                                            <tr>
+                                                <!--  N° -->
+                                                <td style="text-align:center;">
+                                                    <t>
+                                                        <span t-esc="line_number"/>
+                                                        <t t-set="line_number" t-value="line_number + 1"/>
+                                                    </t>
+                                                </td>
+
+                                                <!--  Fecha de documento -->
+
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['final_date']">
+                                                        <t t-esc="move['final_date']"
+                                                           t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>
+                                                    </t>
+                                                    <t t-if="not move['final_date']">
+                                                        <strong>-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Número de documento -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['ref']">
+                                                        <t t-esc="move['ref']"/>
+                                                    </t>
+                                                    <t t-if="not move['ref']">
+                                                        <strong>-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  NRC -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['document_nrc']">
+                                                        <t t-esc="move['document_nrc']"/>
+                                                    </t>
+                                                    <t t-if="not move['document_nrc']">
+                                                        <strong>-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  NIT/DUI -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['document_nit_dui']">
+                                                        <t t-esc="move['document_nit_dui']"/>
+                                                    </t>
+                                                    <t t-if="not move['document_nit_dui']">
+                                                        <strong>-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Nombre de partner -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['partner_id']">
+                                                        <t t-esc="move['partner_id'][1]"/>
+                                                    </t>
+                                                    <t t-if="not move['partner_id']">
+                                                        <strong>-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Compras exentas locales -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['compras_exentas_internas']">
+                                                        <t t-esc="move['compras_exentas_internas']"
+                                                           t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+
+                                                    </t>
+                                                    <t t-if="not move['compras_exentas_internas']">
+                                                        <strong>$-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Compras exentas importaciones -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['compras_exentas_importacion']">
+                                                        <t t-esc="move['compras_exentas_importacion']"
+                                                           t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </t>
+                                                    <t t-if="not move['compras_exentas_importacion']">
+                                                        <strong>$-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Compras exentas internaciones -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['compras_exentas_internacional']">
+                                                        <t t-esc="move['compras_exentas_internacional']"
+                                                           t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </t>
+                                                    <t t-if="not move['compras_exentas_internacional']">
+                                                        <strong>$-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Compras gravadas locales -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['compras_gravadas_internas']">
+                                                        <t t-esc="move['compras_gravadas_internas']"
+                                                           t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </t>
+                                                    <t t-if="not move['compras_gravadas_internas']">
+                                                        <strong>$-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Compras gravadas importacion -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['compras_gravadas_importacion']">
+                                                        <t t-esc="move['compras_gravadas_importacion']"
+                                                           t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </t>
+                                                    <t t-if="not move['compras_gravadas_importacion']">
+                                                        <strong>$-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Compras gravadas internacion -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['compras_gravadas_internacionales']">
+                                                        <t t-esc="move['compras_gravadas_internacionales']"
+                                                           t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </t>
+                                                    <t t-if="not move['compras_gravadas_internacionales']">
+                                                        <strong>$-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  IVA -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['iva_ccf']">
+                                                        <t t-esc="move['iva_ccf']"
+                                                           t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </t>
+                                                    <t t-if="not move['iva_ccf']">
+                                                        <strong>$-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Total compras -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['amount_total_compras']">
+                                                        <t t-esc="move['amount_total_compras']"
+                                                           t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </t>
+                                                    <t t-if="not move['amount_total_compras']">
+                                                        <strong>$-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Percepción -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['anticipo_cuenta_percibido']">
+                                                        <t t-esc="move['anticipo_cuenta_percibido']"
+                                                           t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </t>
+                                                    <t t-if="not move['anticipo_cuenta_percibido']">
+                                                        <strong>$-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Retención a terceros -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['compras_retencion_terceros']">
+                                                        <t t-esc="move['compras_retencion_terceros']"/>
+                                                    </t>
+                                                    <t t-if="not move['compras_retencion_terceros']">
+                                                        <strong>$-</strong>
+                                                    </t>
+                                                </td>
+                                                <!--  Sujetos de retención -->
+                                                <td style="text-align:center;">
+                                                    <t t-if="move['compras_sujeto_excluido']">
+                                                        <t t-esc="move['compras_sujeto_excluido']"
+                                                           t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </t>
+                                                    <t t-if="not move['compras_sujeto_excluido']">
+                                                        <strong>$-</strong>
+                                                    </t>
+                                                </td>
+                                            </tr>
+
+                                        </t>
+
+                                    </tbody>
+                                    <tr>
+                                        <td>
+                                        </td>
+
+                                        <td>
+                                        </td>
+
+                                        <td>
+                                        </td>
+
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
+
+                                        <td>TOTALES
+                                        </td>
+
+                                        <td>
+                                            <t t-set="sum_compras_exentas_internas"
+                                               t-value="sum(move['compras_exentas_internas'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_exentas_internas"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                        <td>
+                                            <t t-set="sum_compras_exentas_importacion"
+                                               t-value="sum(move['compras_exentas_importacion'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_exentas_importacion"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                        <td>
+                                            <t t-set="sum_compras_exentas_internacion"
+                                               t-value="sum(move['compras_exentas_internacional'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_exentas_internacion"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+
+                                        <td>
+                                            <t t-set="sum_compras_gravadas_internas"
+                                               t-value="sum(move['compras_gravadas_internas'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_gravadas_internas"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+
+                                        <td>
+                                            <t t-set="sum_compras_gravadas_importacion"
+                                               t-value="sum(move['compras_gravadas_importacion'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_gravadas_importacion"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+
+                                        <td>
+                                            <t t-set="sum_compras_gravadas_internacion"
+                                               t-value="sum(move['compras_gravadas_internacionales'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_gravadas_internacion"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+
+                                        <td>
+                                            <t t-set="iva_ccf"
+                                               t-value="sum(move['iva_ccf'] for move in account_moves_compra)"/>
+                                            <t t-esc="iva_ccf"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+
+                                        <td>
+                                            <t t-set="total_compras"
+                                               t-value="sum(move['amount_total_compras'] for move in account_moves_compra)"/>
+                                            <t t-esc="total_compras"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                        <td>
+                                            <t t-set="percepcion"
+                                               t-value="sum(move['anticipo_cuenta_percibido'] for move in account_moves_compra)"/>
+                                            <t t-esc="percepcion"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                        <td>
+                                            <t t-set="retencion"
+                                               t-value="sum(move['compras_retencion_terceros'] for move in account_moves_compra)"/>
+                                            <t t-esc="retencion"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                        <td>
+                                            <t t-set="sujetos"
+                                               t-value="sum(move['compras_sujeto_excluido'] for move in account_moves_compra)"/>
+                                            <t t-esc="sujetos"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </t>
+
+
+                            <!--TODO: TERMINAR DE DIVIDIR POR SUCURSAL Y CREAR CUADRO DE SUMATORIAS REVISAR EN FORMATOS ENVIADOS -->
+                            <!--                            Tabla de libro de contribuyentes-->
+                            <t t-if="data['select_book'] == 'ventas_ccf'">
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:left;">
+                                                <strong>N°</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Fecha de documento</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Número de documento</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Nombre de cliente</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>NRC</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Ventas no sujetas</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Ventas exentas propias</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Venta gravadas propia</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>IVA Deb. Fiscal Propia</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Ventas exentas terceros</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Venta gravadas terceros</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>IVA Deb. Fiscal terceros</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Iva retenido</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Iva percibido</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Venta Total</strong>
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <t t-set="line_number" t-value="1"/>
+
+                                        <!-- Sección para Casa Matriz -->
+                                        <t t-set="matriz_invoices" t-value="[]"/>
+                                        <t t-foreach="account_moves_compra" t-as="move">
+                                            <t t-if="move['selection_location_related'] == 'matriz' and move['book_type_related'] == 'ccf'">
+                                                <t t-set="matriz_invoices" t-value="matriz_invoices + [move]"/>
+                                            </t>
+                                        </t>
+                                        <t t-if="matriz_invoices">
+                                            <tr>
+                                                <td colspan="15">
+                                                    <h3>Casa Matriz</h3>
+                                                </td>
+                                            </tr>
+                                            <t t-foreach="matriz_invoices" t-as="move">
+                                                <tr>
+                                                    <!-- Renderizar cada celda de datos para Casa Matriz aquí -->
+                                                    <td style="text-align:center;">
+                                                        <t>
+                                                            <span t-esc="line_number"/>
+                                                            <t t-set="line_number" t-value="line_number + 1"/>
+                                                        </t>
+                                                    </td>
+
+                                                    <!--  Fecha de documento -->
+
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['date']">
+                                                            <t t-esc="move['date']"
+                                                               t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>
+                                                        </t>
+                                                        <t t-if="not move['date']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Número de documento -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['name']">
+                                                            <t t-esc="move['name']"/>
+                                                        </t>
+                                                        <t t-if="not move['name']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Nombre de cliente -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['partner_id']">
+                                                            <t t-esc="move['partner_id'][1]"/>
+                                                        </t>
+                                                        <t t-if="not move['partner_id']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  NRC -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['document_nrc']">
+                                                            <t t-esc="move['document_nrc']"/>
+                                                        </t>
+                                                        <t t-if="not move['document_nrc']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas no sujetas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_no_sujetas']">
+                                                            <t t-esc="move['ventas_no_sujetas']"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_no_sujetas']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  ventas exentas locales -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exentas_ccf']">
+                                                            <t t-esc="move['ventas_exentas_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+
+                                                        </t>
+                                                        <t t-if="not move['ventas_exentas_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas gravadas propia -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_gravadas_ccf']">
+                                                            <t t-esc="move['ventas_gravadas_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_gravadas_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  IVA CCF -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['iva_ccf']">
+                                                            <t t-esc="move['iva_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['iva_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas exentas terceros -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exentas_terceros']">
+                                                            <t t-esc="move['ventas_exentas_terceros']"
+                                                            />
+                                                        </t>
+                                                        <t t-if="not move['ventas_exentas_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas gravadas terceros -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_gravadas_terceros']">
+                                                            <t t-esc="move['ventas_gravadas_terceros']"
+                                                            />
+                                                        </t>
+                                                        <t t-if="not move['ventas_gravadas_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  IVA Terceros -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_iva_terceros']">
+                                                            <t t-esc="move['ventas_iva_terceros']"
+                                                            />
+                                                        </t>
+                                                        <t t-if="not move['ventas_iva_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  IVA retenido-->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['retencion_fc']">
+                                                            <t t-esc="move['retencion_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['retencion_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Iva percibido -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['percepcion_ccf']">
+                                                            <t t-esc="move['percepcion_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['percepcion_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!-- Venta total-->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['total_ccf']">
+                                                            <t t-esc="move['total_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['total_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+
+                                                </tr>
+                                            </t>
+                                        </t>
+
+                                        <!-- Sección para Santa Tecla -->
+                                        <t t-set="tecla_invoices" t-value="[]"/>
+                                        <t t-foreach="account_moves_compra" t-as="move">
+                                            <t t-if="move['selection_location_related'] == 'tecla' and move['book_type_related'] == 'ccf'">
+                                                <t t-set="tecla_invoices" t-value="tecla_invoices + [move]"/>
+                                            </t>
+                                        </t>
+                                        <t t-if="tecla_invoices">
+                                            <tr>
+                                                <td colspan="15">
+                                                    <h3>Santa Tecla</h3>
+                                                </td>
+                                            </tr>
+                                            <t t-foreach="tecla_invoices" t-as="move">
+                                                <tr>
+                                                    <!-- Renderizar cada celda de datos para Casa Matriz aquí -->
+                                                    <td style="text-align:center;">
+                                                        <t>
+                                                            <span t-esc="line_number"/>
+                                                            <t t-set="line_number" t-value="line_number + 1"/>
+                                                        </t>
+                                                    </td>
+
+                                                    <!--  Fecha de documento -->
+
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['date']">
+                                                            <t t-esc="move['date']"
+                                                               t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>
+                                                        </t>
+                                                        <t t-if="not move['date']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Número de documento -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['name']">
+                                                            <t t-esc="move['name']"/>
+                                                        </t>
+                                                        <t t-if="not move['name']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Nombre de cliente -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['partner_id']">
+                                                            <t t-esc="move['partner_id'][1]"/>
+                                                        </t>
+                                                        <t t-if="not move['partner_id']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  NRC -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['document_nrc']">
+                                                            <t t-esc="move['document_nrc']"/>
+                                                        </t>
+                                                        <t t-if="not move['document_nrc']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas no sujetas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_no_sujetas']">
+                                                            <t t-esc="move['ventas_no_sujetas']"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_no_sujetas']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  ventas exentas locales -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exentas_ccf']">
+                                                            <t t-esc="move['ventas_exentas_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+
+                                                        </t>
+                                                        <t t-if="not move['ventas_exentas_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas gravadas propia -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_gravadas_ccf']">
+                                                            <t t-esc="move['ventas_gravadas_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_gravadas_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  IVA CCF -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['iva_ccf']">
+                                                            <t t-esc="move['iva_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['iva_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas exentas terceros -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exentas_terceros']">
+                                                            <t t-esc="move['ventas_exentas_terceros']"
+                                                            />
+                                                        </t>
+                                                        <t t-if="not move['ventas_exentas_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas gravadas terceros -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_gravadas_terceros']">
+                                                            <t t-esc="move['ventas_gravadas_terceros']"
+                                                            />
+                                                        </t>
+                                                        <t t-if="not move['ventas_gravadas_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  IVA Terceros -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_iva_terceros']">
+                                                            <t t-esc="move['ventas_iva_terceros']"
+                                                            />
+                                                        </t>
+                                                        <t t-if="not move['ventas_iva_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  IVA retenido-->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['retencion_fc']">
+                                                            <t t-esc="move['retencion_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['retencion_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Iva percibido -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['percepcion_ccf']">
+                                                            <t t-esc="move['percepcion_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['percepcion_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!-- Venta total-->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['total_ccf']">
+                                                            <t t-esc="move['total_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['total_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+
+                                        <!-- Sección para Documentos contables liquidacion -->
+                                        <t t-set="dcl_invoices" t-value="[]"/>
+                                        <t t-foreach="account_moves_compra" t-as="move">
+                                            <t t-if="move['move_type'] == 'entry' and move['book_type_related'] == 'ccf'">
+                                                <t t-set="dcl_invoices" t-value="dcl_invoices + [move]"/>
+                                            </t>
+                                        </t>
+                                        <t t-if="dcl_invoices">
+                                            <tr>
+                                                <td colspan="15">
+                                                    <h3>Documento contable de liquidación</h3>
+                                                </td>
+                                            </tr>
+                                            <t t-foreach="dcl_invoices" t-as="move">
+                                                <tr>
+                                                    <!-- Renderizar cada celda de datos para Casa Matriz aquí -->
+                                                    <td style="text-align:center;">
+                                                        <t>
+                                                            <span t-esc="line_number"/>
+                                                            <t t-set="line_number" t-value="line_number + 1"/>
+                                                        </t>
+                                                    </td>
+
+                                                    <!--  Fecha de documento -->
+
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['date']">
+                                                            <t t-esc="move['date']"
+                                                               t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>
+                                                        </t>
+                                                        <t t-if="not move['date']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Número de documento -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['name']">
+                                                            <t t-esc="move['name']"/>
+                                                        </t>
+                                                        <t t-if="not move['name']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Nombre de cliente -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['partner_id']">
+                                                            <t t-esc="move['partner_id'][1]"/>
+                                                        </t>
+                                                        <t t-if="not move['partner_id']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  NRC -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['document_nrc']">
+                                                            <t t-esc="move['document_nrc']"/>
+                                                        </t>
+                                                        <t t-if="not move['document_nrc']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas no sujetas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_no_sujetas']">
+                                                            <t t-esc="move['ventas_no_sujetas']"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_no_sujetas']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  ventas exentas locales -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exentas_ccf']">
+                                                            <t t-esc="move['ventas_exentas_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+
+                                                        </t>
+                                                        <t t-if="not move['ventas_exentas_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas gravadas propia -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_gravadas_ccf']">
+                                                            <t t-esc="move['ventas_gravadas_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_gravadas_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  IVA CCF -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['iva_ccf']">
+                                                            <t t-esc="move['iva_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['iva_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas exentas terceros -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exentas_terceros']">
+                                                            <t t-esc="move['ventas_exentas_terceros']"
+                                                            />
+                                                        </t>
+                                                        <t t-if="not move['ventas_exentas_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Ventas gravadas terceros -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_gravadas_terceros']">
+                                                            <t t-esc="move['ventas_gravadas_terceros']"
+                                                            />
+                                                        </t>
+                                                        <t t-if="not move['ventas_gravadas_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  IVA Terceros -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_iva_terceros']">
+                                                            <t t-esc="move['ventas_iva_terceros']"
+                                                            />
+                                                        </t>
+                                                        <t t-if="not move['ventas_iva_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  IVA retenido-->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['retencion_fc']">
+                                                            <t t-esc="move['retencion_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['retencion_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Iva percibido -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['percepcion_ccf']">
+                                                            <t t-esc="move['percepcion_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['percepcion_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!-- Venta total-->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['total_ccf']">
+                                                            <t t-esc="move['total_ccf']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['total_ccf']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+
+                                        <tr>
+
+
+                                            <td>
+                                            </td>
+
+                                            <td>
+                                            </td>
+
+                                            <td>
+                                            </td>
+
+                                            <td>
+                                            </td>
+
+                                            <td>
+                                            </td>
+
+                                            <td>
+                                            </td>
+
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+
+                                            <td>
+                                            </td>
+
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+
+                                        </tr>
+
+                                    </tbody>
+
+
+                                    <tr>
+
+
+                                        <td>
+                                        </td>
+
+                                        <td>
+                                        </td>
+
+                                        <td>
+                                        </td>
+
+                                        <td>
+                                        </td>
+
+                                        <td>TOTALES
+                                        </td>
+
+                                        <td>$0.00
+                                        </td>
+
+                                        <td>
+                                            <t t-set="sum_ventas_exentas_internas"
+                                               t-value="sum(move['ventas_exentas_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                            <t t-esc="sum_ventas_exentas_internas"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+
+                                        </td>
+                                        <td>
+                                            <t t-set="sum_ventas_gravadas_ccf"
+                                               t-value="sum(move['ventas_gravadas_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                            <t t-esc="sum_ventas_gravadas_ccf"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                        <td>
+                                            <t t-set="sum_iva_ccf"
+                                               t-value="sum(move['iva_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                            <t t-esc="sum_iva_ccf"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+
+                                        <td>
+                                            $0.00
+                                        </td>
+
+                                        <td>
+                                            $0.00
+                                        </td>
+
+                                        <td>
+                                            $0.00
+                                        </td>
+
+                                        <td>
+                                            <t t-set="sum_retencion_ccf"
+                                               t-value="sum(move['retencion_fc'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                            <t t-esc="sum_retencion_ccf"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                        <td>
+                                            <t t-set="sum_iva_per"
+                                               t-value="sum(move['percepcion_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                            <t t-esc="sum_iva_per"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                        <td>
+                                            <t t-set="sum_total"
+                                               t-value="sum(move['total_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                            <t t-esc="sum_total"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+
+                                    </tr>
+
+                                </table>
+
+                                <br/>
+
+                                <p style="page-break-after:always;"></p>
+
+                                <!--    TABLA DE SUMATORIA DE SALDOS-->
+                                <div class="col-7 text-right ml-auto">
+                                    <table class="table table-condensed">
+                                        <tr>
+                                            <td colspan="6" style="text-align: center;">
+                                                <strong>Resumen de Operaciones de Ventas</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:30mm"></td>
+                                            <td style="text-align: center;">
+                                                <strong>Vta. Neta Propias</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong>Déb. Fiscal Propias</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong>Vta. Neta Terceros</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong>Déb. Fiscal Terceros</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong>IVA Retenido</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align: left; outline:1px solid black">
+                                                <strong>Operaciones Internas Gravadas</strong>
+                                            </td>
+                                        </tr>
+                                        <!--                                        Operacion interna contribuyentes-->
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <strong>Contribuyentes:</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_ventas_gravadas_ccf"
+                                                   t-value="sum(move['ventas_gravadas_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                                <t t-esc="sum_ventas_gravadas_ccf"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_iva_ccf"
+                                                   t-value="sum(move['iva_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                                <t t-esc="sum_iva_ccf"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_retencion_ccf"
+                                                   t-value="sum(move['retencion_fc'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                                <t t-esc="sum_retencion_ccf"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                        </tr>
+                                        <!--                                        Operacion interna consumidor final-->
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <strong>Consumidor Final:</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_ventas_gravadas_fc"
+                                                   t-value="sum(move['ventas_gravadas_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf') / 113 * 100"/>
+                                                <t t-esc="sum_ventas_gravadas_fc"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_ventas_iva_fc"
+                                                   t-value="sum(move['ventas_gravadas_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf') / 113 * 100 * 0.13"/>
+                                                <t t-esc="sum_ventas_iva_fc"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_retencion_fc"
+                                                   t-value="sum(move['retencion_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf')"/>
+                                                <t t-esc="sum_retencion_fc"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                        </tr>
+
+                                        <tr style="outline:solid">
+                                            <td style="text-align: center;">
+                                                <strong>TOTAL:</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_ventas_gravadas_ccf"
+                                                   t-value="sum(move['ventas_gravadas_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                                <t t-set="sum_ventas_gravadas_fc"
+                                                   t-value="sum(move['ventas_gravadas_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf') / 113 * 100"/>
+                                                <t t-set="sum_ventas_total"
+                                                   t-value="sum_ventas_gravadas_ccf + sum_ventas_gravadas_fc"
+                                                />
+                                                <t t-esc="sum_ventas_total"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_iva_ccf"
+                                                   t-value="sum(move['iva_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                                <t t-set="sum_ventas_iva_fc"
+                                                   t-value="sum(move['ventas_gravadas_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf') / 113 * 100 * 0.13"/>
+                                                <t t-set="sum_iva_total"
+                                                   t-value="sum_iva_ccf + sum_ventas_iva_fc"
+                                                />
+                                                <t t-esc="sum_iva_total"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+
+
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_retencion_fc"
+                                                   t-value="sum(move['retencion_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf')"/>
+                                                <t t-set="sum_retencion_ccf"
+                                                   t-value="sum(move['retencion_fc'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                                <t t-set="sum_ret_total"
+                                                   t-value="sum_retencion_fc + sum_retencion_ccf"
+                                                />
+                                                <t t-esc="sum_ret_total"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                        </tr>
+
+                                        <!--         Operaciones internas exentas-->
+                                        <tr>
+                                            <td colspan="6" style="text-align: left; outline:1px solid black">
+                                                <strong>Operaciones Internas Exentas</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <strong>Contribuyentes:</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_ventas_exentas_internas"
+                                                   t-value="sum(move['ventas_exentas_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                                <t t-esc="sum_ventas_exentas_internas"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <strong>Consumidor Final:</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+
+                                                <t t-set="sum_ventas_exentas_internas_fc"
+                                                   t-value="sum(move['ventas_exentas_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf')"/>
+                                                <t t-esc="sum_ventas_exentas_internas_fc"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <strong>TOTAL:</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_ventas_exentas_internas_fc"
+                                                   t-value="sum(move['ventas_exentas_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf')"/>
+                                                <t t-set="sum_ventas_exentas_internas"
+                                                   t-value="sum(move['ventas_exentas_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                                <t t-set="sum_ventas_total"
+                                                   t-value="sum_ventas_exentas_internas_fc + sum_ventas_exentas_internas"
+                                                />
+                                                <t t-esc="sum_ventas_total"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                        </tr>
+
+                                        <!--        EXPORTACIONES-->
+                                        <tr>
+                                            <td colspan="6" style="text-align: left; outline:1px solid black    ">
+                                                <strong>Exportaciones</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <strong>Fuera de la región C.A.</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_ventas_fex_out_ca"
+                                                   t-value="sum(move['ventas_exportaciones_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf' and move['location_fex'] == 'out_ca')"/>
+                                                <t t-esc="sum_ventas_fex_out_ca"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <strong>Región C.A.</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_ventas_fex_in_ca"
+                                                   t-value="sum(move['ventas_exportaciones_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf' and move['location_fex'] == 'in_ca')"/>
+                                                <t t-esc="sum_ventas_fex_in_ca"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <strong>Zona Francas y DPA</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_ventas_fex_zona"
+                                                   t-value="sum(move['ventas_exportaciones_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf' and move['location_fex'] == 'zona')"/>
+                                                <t t-esc="sum_ventas_fex_zona"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <strong>TOTAL:</strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <t t-set="sum_ventas_fex_zona"
+                                                   t-value="sum(move['ventas_exportaciones_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf' and move['location_fex'] == 'zona')"/>
+                                                <t t-set="sum_ventas_fex_out_ca"
+                                                   t-value="sum(move['ventas_exportaciones_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf' and move['location_fex'] == 'out_ca')"/>
+                                                <t t-set="sum_ventas_fex_in_ca"
+                                                   t-value="sum(move['ventas_exportaciones_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf' and move['location_fex'] == 'in_ca')"/>
+                                                <t t-set="sum_ventas_total_fex"
+                                                   t-value="sum_ventas_fex_zona + sum_ventas_fex_out_ca + sum_ventas_fex_in_ca"
+                                                />
+                                                <t t-esc="sum_ventas_total_fex"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong></strong>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="1"
+                                                style="text-align: left; outline:1px solid black; background-color: #c5cfd6">
+                                                <strong>Total de Ventas:</strong>
+                                            </td>
+                                            <td colspan="5"
+                                                style="outline:1px solid black; background-color: #c5cfd6">
+                                                <span style="margin-left:12mm">
+                                                    <t t-set="sum_ventas_fex_zona"
+                                                       t-value="sum(move['ventas_exportaciones_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf' and move['location_fex'] == 'zona')"/>
+                                                    <t t-set="sum_ventas_fex_out_ca"
+                                                       t-value="sum(move['ventas_exportaciones_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf' and move['location_fex'] == 'out_ca')"/>
+                                                    <t t-set="sum_ventas_fex_in_ca"
+                                                       t-value="sum(move['ventas_exportaciones_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf' and move['location_fex'] == 'in_ca')"/>
+                                                    <t t-set="sum_ventas_total_fex"
+                                                       t-value="sum_ventas_fex_zona + sum_ventas_fex_out_ca + sum_ventas_fex_in_ca"
+                                                    />
+
+
+                                                    <t t-set="sum_ventas_exentas_internas_fc"
+                                                       t-value="sum(move['ventas_exentas_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf')"/>
+                                                    <t t-set="sum_ventas_exentas_internas"
+                                                       t-value="sum(move['ventas_exentas_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                                    <t t-set="sum_ventas_total"
+                                                       t-value="sum_ventas_exentas_internas_fc + sum_ventas_exentas_internas"
+                                                    />
+
+                                                    <t t-set="sum_ventas_gravadas_ccf"
+                                                       t-value="sum(move['ventas_gravadas_ccf'] for move in account_moves_compra if move['book_type_related'] == 'ccf')"/>
+                                                    <t t-set="sum_ventas_gravadas_fc"
+                                                       t-value="sum(move['ventas_gravadas_fc'] for move in account_moves_compra if move['book_type_related'] == 'fcf') / 113 * 100"/>
+                                                    <t t-set="sum_ventas_total_c"
+                                                       t-value="sum_ventas_gravadas_ccf + sum_ventas_gravadas_fc"
+                                                    />
+
+
+                                                    <t t-set="sum_total_ventas"
+                                                       t-value="sum_ventas_total_fex + sum_ventas_total + sum_ventas_total_c"
+                                                    />
+
+                                                    <t t-esc="sum_total_ventas"
+                                                       t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                    </table>
+                                </div>
+
+                            </t>
+
+                            <!--                            Tabla de libro de consumidor final-->
+
+                            <t t-if="data['select_book'] == 'ventas_cf'">
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:left;">
+                                                <strong>N°</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Fecha</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Número de factura</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Local</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Caja</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>No sujetas</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Exentas</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Gravadas</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Exportaciones</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Retención</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Percepción</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Total</strong>
+                                            </th>
+                                            <th style="text-align:left;">
+                                                <strong>Venta a cuenta a terceros</strong>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="line_number" t-value="1"/>
+
+                                        <!-- Sección para Casa Matriz -->
+                                        <t t-set="matriz_invoices" t-value="[]"/>
+                                        <t t-foreach="account_moves_compra" t-as="move">
+                                            <t t-if="move['selection_location_related'] == 'matriz'">
+                                                <t t-set="matriz_invoices" t-value="matriz_invoices + [move]"/>
+                                            </t>
+                                        </t>
+                                        <t t-if="matriz_invoices">
+                                            <tr>
+                                                <td colspan="13">
+                                                    <h3>Casa Matriz</h3>
+                                                </td>
+                                            </tr>
+                                            <t t-foreach="matriz_invoices" t-as="move">
+                                                <tr>
+                                                    <!-- Renderizar cada celda de datos para Casa Matriz aquí -->
+                                                    <!--  N° -->
+                                                    <td style="text-align:center;">
+                                                        <t>
+                                                            <span t-esc="line_number"/>
+                                                            <t t-set="line_number" t-value="line_number + 1"/>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Fecha de documento -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['invoice_date']">
+                                                            <t t-esc="move['invoice_date']"
+                                                               t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>
+                                                        </t>
+                                                        <t t-if="not move['invoice_date']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Número de documento -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['name']">
+                                                            <t t-esc="move['name']"/>
+                                                        </t>
+                                                        <t t-if="not move['name']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Local -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['num_local_fc']">
+                                                            <t t-esc="move['num_local_fc']"/>
+                                                        </t>
+                                                        <t t-if="not move['num_local_fc']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Caja  -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['num_caja']">
+                                                            <t t-esc="move['num_caja']"/>
+                                                        </t>
+                                                        <t t-if="not move['num_caja']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  No sujetas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_no_sujetas']">
+                                                            <t t-esc="move['ventas_no_sujetas']"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_no_sujetas']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--   exentas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exentas_fc']">
+                                                            <t t-esc="move['ventas_exentas_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+
+                                                        </t>
+                                                        <t t-if="not move['ventas_exentas_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Gravadas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_gravadas_fc']">
+                                                            <t t-esc="move['ventas_gravadas_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_gravadas_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Exportaciones -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exportaciones_fc']">
+                                                            <t t-esc="move['ventas_exportaciones_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_exportaciones_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Retención -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['retencion_fc']">
+                                                            <t t-esc="move['retencion_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['retencion_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Percepción -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['percepcion_fc']">
+                                                            <t t-esc="move['percepcion_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['percepcion_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!-- Total -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['total_fc']">
+                                                            <t t-esc="move['total_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['total_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!-- Venta cuenta terceros-->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_cuenta_terceros']">
+                                                            <t t-esc="move['ventas_cuenta_terceros']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_cuenta_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+
+                                        <!-- Sección para Santa Tecla -->
+                                        <t t-set="tecla_invoices" t-value="[]"/>
+                                        <t t-foreach="account_moves_compra" t-as="move">
+                                            <t t-if="move['selection_location_related'] == 'tecla'">
+                                                <t t-set="tecla_invoices" t-value="tecla_invoices + [move]"/>
+                                            </t>
+                                        </t>
+                                        <t t-if="tecla_invoices">
+                                            <tr>
+                                                <td colspan="13">
+                                                    <h3>Santa Tecla</h3>
+                                                </td>
+                                            </tr>
+                                            <t t-foreach="tecla_invoices" t-as="move">
+                                                <tr>
+                                                    <!--  N° -->
+                                                    <td style="text-align:center;">
+                                                        <t>
+                                                            <span t-esc="line_number"/>
+                                                            <t t-set="line_number" t-value="line_number + 1"/>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Fecha de documento -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['invoice_date']">
+                                                            <t t-esc="move['invoice_date']"
+                                                               t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>
+                                                        </t>
+                                                        <t t-if="not move['invoice_date']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Número de documento -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['name']">
+                                                            <t t-esc="move['name']"/>
+                                                        </t>
+                                                        <t t-if="not move['name']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Local -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['num_local_fc']">
+                                                            <t t-esc="move['num_local_fc']"/>
+                                                        </t>
+                                                        <t t-if="not move['num_local_fc']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Caja  -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['num_caja']">
+                                                            <t t-esc="move['num_caja']"/>
+                                                        </t>
+                                                        <t t-if="not move['num_caja']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  No sujetas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_no_sujetas']">
+                                                            <t t-esc="move['ventas_no_sujetas']"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_no_sujetas']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--   exentas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exentas_fc']">
+                                                            <t t-esc="move['ventas_exentas_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+
+                                                        </t>
+                                                        <t t-if="not move['ventas_exentas_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Gravadas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_gravadas_fc']">
+                                                            <t t-esc="move['ventas_gravadas_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_gravadas_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Exportaciones -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exportaciones_fc']">
+                                                            <t t-esc="move['ventas_exportaciones_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_exportaciones_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Retención -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['retencion_fc']">
+                                                            <t t-esc="move['retencion_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['retencion_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Percepción -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['percepcion_fc']">
+                                                            <t t-esc="move['percepcion_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['percepcion_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!-- Total -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['total_fc']">
+                                                            <t t-esc="move['total_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['total_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!-- Venta cuenta terceros-->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_cuenta_terceros']">
+                                                            <t t-esc="move['ventas_cuenta_terceros']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_cuenta_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+
+                                        <!-- Sección para Facturas de exportacion -->
+                                        <t t-set="fex_invoices" t-value="[]"/>
+                                        <t t-foreach="account_moves_compra" t-as="move">
+                                            <t t-if="move['selection_location_related'] == 'fex'">
+                                                <t t-set="fex_invoices" t-value="fex_invoices + [move]"/>
+                                            </t>
+                                        </t>
+                                        <t t-if="fex_invoices">
+                                            <tr>
+                                                <td colspan="13">
+                                                    <h3>Exportaciones</h3>
+                                                </td>
+                                            </tr>
+                                            <t t-foreach="fex_invoices" t-as="move">
+                                                <tr>
+                                                    <!-- Resto de los campos de la tabla -->
+                                                    <!--  N° -->
+                                                    <td style="text-align:center;">
+                                                        <t>
+                                                            <span t-esc="line_number"/>
+                                                            <t t-set="line_number" t-value="line_number + 1"/>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Fecha de documento -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['invoice_date']">
+                                                            <t t-esc="move['invoice_date']"
+                                                               t-options='{"widget": "date","format": "dd-MM-yyyy"}'/>
+                                                        </t>
+                                                        <t t-if="not move['invoice_date']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Número de documento -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['name']">
+                                                            <t t-esc="move['name']"/>
+                                                        </t>
+                                                        <t t-if="not move['name']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Local -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['num_local_fc']">
+                                                            <t t-esc="move['num_local_fc']"/>
+                                                        </t>
+                                                        <t t-if="not move['num_local_fc']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Caja  -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['num_caja']">
+                                                            <t t-esc="move['num_caja']"/>
+                                                        </t>
+                                                        <t t-if="not move['num_caja']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  No sujetas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_no_sujetas']">
+                                                            <t t-esc="move['ventas_no_sujetas']"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_no_sujetas']">
+                                                            <strong>-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--   exentas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exentas_fc']">
+                                                            <t t-esc="move['ventas_exentas_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+
+                                                        </t>
+                                                        <t t-if="not move['ventas_exentas_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Gravadas -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_gravadas_fc']">
+                                                            <t t-esc="move['ventas_gravadas_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_gravadas_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Exportaciones -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_exportaciones_fc']">
+                                                            <t t-esc="move['ventas_exportaciones_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_exportaciones_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Retención -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['retencion_fc']">
+                                                            <t t-esc="move['retencion_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['retencion_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!--  Percepción -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['percepcion_fc']">
+                                                            <t t-esc="move['percepcion_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['percepcion_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!-- Total -->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['total_fc']">
+                                                            <t t-esc="move['total_fc']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['total_fc']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                    <!-- Venta cuenta terceros-->
+                                                    <td style="text-align:center;">
+                                                        <t t-if="move['ventas_cuenta_terceros']">
+                                                            <t t-esc="move['ventas_cuenta_terceros']"
+                                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </t>
+                                                        <t t-if="not move['ventas_cuenta_terceros']">
+                                                            <strong>$-</strong>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+
+                                    </tbody>
+                                    <tr>
+                                        <td>
+                                        </td>
+
+                                        <td>
+                                        </td>
+
+                                        <td>TOTALES
+                                        </td>
+
+                                        <td>$0.00
+                                        </td>
+
+                                        <td>$0.00
+                                        </td>
+
+                                        <td>$0.00
+                                        </td>
+
+                                        <td>
+                                            <t t-set="sum_compras_exentas_internas"
+                                               t-value="sum(move['ventas_exentas_fc'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_exentas_internas"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                        <td>
+                                            <t t-set="sum_compras_exentas_importacion"
+                                               t-value="sum(move['ventas_gravadas_fc'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_exentas_importacion"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                        <td>
+                                            <t t-set="sum_compras_exentas_internacion"
+                                               t-value="sum(move['ventas_exportaciones_fc'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_exentas_internacion"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+
+                                        <td>
+                                            <t t-set="sum_compras_gravadas_internas"
+                                               t-value="sum(move['retencion_fc'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_gravadas_internas"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+
+                                        <td>
+                                            <t t-set="sum_compras_gravadas_importacion"
+                                               t-value="sum(move['percepcion_fc'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_gravadas_importacion"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+
+                                        <td>
+                                            <t t-set="sum_compras_gravadas_internacion"
+                                               t-value="sum(move['total_fc'] for move in account_moves_compra)"/>
+                                            <t t-esc="sum_compras_gravadas_internacion"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                            />
+                                        </td>
+                                        <td>$0.00
+                                        </td>
+
+                                    </tr>
+
+                                </table>
+
+
+                                <br/>
+                                <p style="page-break-after:always;"></p>
+
+                                <!--    TABLA DE SUMATORIA DE SALDOS-->
+                                <div class="col-7 text-right ml-auto" style="border:1px solid black">
+                                    <table class="table table-condensed">
+                                        <strong style="text-align:center">Cálculo de débito fiscal</strong>
+
+                                        <tr class="border-black">
+                                            <td>
+                                                <strong>Ventas Internas Gravadas N</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-set="sum_ventas_gravadas"
+                                                   t-value="sum(move['ventas_gravadas_fc'] for move in account_moves_compra) / 113 * 100"/>
+                                                <t t-esc="sum_ventas_gravadas"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr class="border-black">
+                                            <td>
+
+                                                <strong>x 13% (IVA)</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-set="sum_ventas_gravadas_iva"
+                                                   t-value="sum(move['ventas_gravadas_fc'] for move in account_moves_compra) / 113 * 100 * 0.13"/>
+                                                <t t-esc="sum_ventas_gravadas_iva"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                        </tr>
+
+
+                                        <tr class="border-black">
+                                            <td>
+                                                <strong>Ventas Gravadas Totales</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-set="sum_ventas_gravadas_total"
+                                                   t-value="sum(move['ventas_gravadas_fc'] for move in account_moves_compra)"/>
+                                                <t t-esc="sum_ventas_gravadas_total"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"
+                                                />
+                                            </td>
+                                        </tr>
+
+
+                                    </table>
+
+                                </div>
+                            </t>
+
+                        </div>
+                    </div>
+
+                    <br/>
+                    <br/>
+
+                    <div class="footer-sign" style="text-align: right;">
+                        <div class="sign" style="float: right;">
+                            <span>Elaborado por: _______________________________________________</span>
+                            <br/>
+                            <!-- <span t-esc="request.env.user.name"/> -->
+                            <span>Lic. Benjamín Ernesto Aguilar Barrera</span>
+                            <br/>
+                            <span>Contador General</span>
+                        </div>
+                    </div>
+
+
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>
